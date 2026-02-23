@@ -1,0 +1,32 @@
+name: 30S Prediction Sync
+
+on:
+  schedule:
+    - cron: '*/1 * * * *' # প্রতি ১ মিনিটে চলবে
+  workflow_dispatch:
+
+jobs:
+  run-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Python Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Dependencies
+        run: pip install requests
+
+      - name: Run Script
+        run: python script.py
+
+      - name: Auto Push
+        run: |
+          git config --global user.name "GitHub-Action"
+          git config --global user.email "action@github.com"
+          git add data.json
+          git commit -m "Real-time Update: $(date)" || exit 0
+          git push
